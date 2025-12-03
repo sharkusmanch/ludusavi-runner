@@ -1,0 +1,18 @@
+interval = "30m"
+backup_on_startup = false
+pushgateway_url = "http://custom-pushgateway:9091"
+
+[retry]
+max_attempts = 5
+initial_delay = "10s"
+max_delay = "60s"
+
+[apprise]
+enabled = true
+url = "http://apprise:8000"
+key = "test"
+notify = "always"
+
+[log]
+level = "debug"
+max_size_mb = 20

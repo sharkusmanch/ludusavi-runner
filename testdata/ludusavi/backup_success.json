@@ -1,0 +1,25 @@
+{
+  "overall": {
+    "totalGames": 178,
+    "totalBytes": 3353481924,
+    "processedGames": 174,
+    "processedBytes": 3330568438,
+    "changedGames": {
+      "new": 2,
+      "different": 5,
+      "same": 167
+    }
+  },
+  "games": {
+    "Example Game": {
+      "decision": "Processed",
+      "change": "Same",
+      "files": {
+        "C:/Users/user/AppData/Local/ExampleGame/save.dat": {
+          "change": "Same",
+          "bytes": 1024
+        }
+      }
+    }
+  }
+}

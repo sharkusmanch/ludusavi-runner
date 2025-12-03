@@ -1,0 +1,41 @@
+# Ludusavi Runner Configuration
+# Copy this file to %APPDATA%\ludusavi-runner\config.toml (Windows)
+# or ~/.config/ludusavi-runner/config.toml (Linux/macOS)
+
+# Backup schedule interval
+interval = "20m"
+
+# Run backup immediately on service start
+backup_on_startup = true
+
+# Path to ludusavi binary (auto-detected if empty)
+ludusavi_path = ""
+
+# Pushgateway URL for metrics
+pushgateway_url = "http://pushgateway"
+
+# HTTP retry configuration
+[retry]
+max_attempts = 3
+initial_delay = "5s"
+max_delay = "30s"
+
+# Apprise notifications
+[apprise]
+enabled = true
+url = "http://localhost:8000"
+key = "ludusavi"
+# Notification level: "error", "warning", "always"
+# - error: only on failures
+# - warning: on failures and warnings (e.g., slow backups)
+# - always: on every backup (including success)
+notify = "error"
+
+# Logging configuration
+[log]
+# Level: debug, info, warn, error
+level = "info"
+# Output: empty for stderr, or file path
+output = ""
+# Max log file size before rotation (MB)
+max_size_mb = 10
