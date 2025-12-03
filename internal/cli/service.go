@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"os/user"
 
 	"github.com/sharkusmanch/ludusavi-runner/internal/platform"
 	"github.com/spf13/cobra"
@@ -36,8 +37,17 @@ func runInstall(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("service management is not supported on this platform")
 	}
 
+	// Default to current user if not specified
+	username := installUsername
+	if username == "" {
+		currentUser, err := user.Current()
+		if err == nil {
+			username = currentUser.Username
+		}
+	}
+
 	opts := platform.InstallOptions{
-		Username:   installUsername,
+		Username:   username,
 		ConfigPath: cfgFile,
 		AutoStart:  true,
 	}
@@ -47,6 +57,9 @@ func runInstall(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Println("Service installed successfully.")
+	if username != "" {
+		fmt.Printf("Service will run as: %s\n", username)
+	}
 	fmt.Println("Use 'ludusavi-runner start' to start the service.")
 	return nil
 }
