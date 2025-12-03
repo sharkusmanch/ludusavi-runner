@@ -53,18 +53,20 @@ func runRun(cmd *cobra.Command, args []string) error {
 	}
 	exec := executor.NewLudusaviExecutor(execOpts...)
 
-	// Create metrics pusher
-	metricsPusher := metrics.NewPushgatewayClient(
-		cfg.PushgatewayURL,
-		metrics.WithHTTPClient(httpClient),
-		metrics.WithLogger(logger),
-	)
-
 	// Create runner
 	runnerOpts := []app.RunnerOption{
 		app.WithExecutor(exec),
-		app.WithMetricsPusher(metricsPusher),
 		app.WithLogger(logger),
+	}
+
+	// Create metrics pusher if enabled
+	if cfg.Metrics.Enabled {
+		metricsPusher := metrics.NewPushgatewayClient(
+			cfg.Metrics.PushgatewayURL,
+			metrics.WithHTTPClient(httpClient),
+			metrics.WithLogger(logger),
+		)
+		runnerOpts = append(runnerOpts, app.WithMetricsPusher(metricsPusher))
 	}
 
 	// Create notifier if enabled

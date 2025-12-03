@@ -19,11 +19,14 @@ func testConfig() *config.Config {
 	return &config.Config{
 		Interval:        20 * time.Minute,
 		BackupOnStartup: true,
-		PushgatewayURL:  "http://localhost:9091",
 		Retry: config.RetryConfig{
 			MaxAttempts:  3,
 			InitialDelay: 5 * time.Second,
 			MaxDelay:     30 * time.Second,
+		},
+		Metrics: config.MetricsConfig{
+			Enabled:        false,
+			PushgatewayURL: "",
 		},
 		Apprise: config.AppriseConfig{
 			Enabled: true,

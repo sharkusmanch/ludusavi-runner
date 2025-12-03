@@ -7,15 +7,17 @@ import "time"
 const (
 	DefaultInterval        = 20 * time.Minute
 	DefaultBackupOnStartup = true
-	DefaultPushgatewayURL  = "http://pushgateway"
+
+	DefaultMetricsEnabled    = false
+	DefaultMetricsPushgatewayURL = ""
 
 	DefaultRetryMaxAttempts  = 3
 	DefaultRetryInitialDelay = 5 * time.Second
 	DefaultRetryMaxDelay     = 30 * time.Second
 
-	DefaultAppriseEnabled = true
-	DefaultAppriseURL     = "http://localhost:8000"
-	DefaultAppriseKey     = "ludusavi"
+	DefaultAppriseEnabled = false
+	DefaultAppriseURL     = ""
+	DefaultAppriseKey     = ""
 	DefaultAppriseNotify  = NotifyError
 
 	DefaultLogLevel     = "info"

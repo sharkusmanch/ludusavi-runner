@@ -15,11 +15,17 @@ type Config struct {
 	Interval        time.Duration `mapstructure:"interval"`
 	BackupOnStartup bool          `mapstructure:"backup_on_startup"`
 	LudusaviPath    string        `mapstructure:"ludusavi_path"`
-	PushgatewayURL  string        `mapstructure:"pushgateway_url"`
 	DryRun          bool          `mapstructure:"dry_run"`
 	Retry           RetryConfig   `mapstructure:"retry"`
+	Metrics         MetricsConfig `mapstructure:"metrics"`
 	Apprise         AppriseConfig `mapstructure:"apprise"`
 	Log             LogConfig     `mapstructure:"log"`
+}
+
+// MetricsConfig holds Prometheus metrics configuration.
+type MetricsConfig struct {
+	Enabled        bool   `mapstructure:"enabled"`
+	PushgatewayURL string `mapstructure:"pushgateway_url"`
 }
 
 // RetryConfig holds HTTP retry configuration.
@@ -90,12 +96,14 @@ func (l *Loader) setDefaults() {
 	l.v.SetDefault("interval", DefaultInterval)
 	l.v.SetDefault("backup_on_startup", DefaultBackupOnStartup)
 	l.v.SetDefault("ludusavi_path", "")
-	l.v.SetDefault("pushgateway_url", DefaultPushgatewayURL)
 	l.v.SetDefault("dry_run", false)
 
 	l.v.SetDefault("retry.max_attempts", DefaultRetryMaxAttempts)
 	l.v.SetDefault("retry.initial_delay", DefaultRetryInitialDelay)
 	l.v.SetDefault("retry.max_delay", DefaultRetryMaxDelay)
+
+	l.v.SetDefault("metrics.enabled", DefaultMetricsEnabled)
+	l.v.SetDefault("metrics.pushgateway_url", DefaultMetricsPushgatewayURL)
 
 	l.v.SetDefault("apprise.enabled", DefaultAppriseEnabled)
 	l.v.SetDefault("apprise.url", DefaultAppriseURL)
@@ -166,8 +174,10 @@ func (c *Config) Validate() error {
 		}
 	}
 
-	if c.PushgatewayURL == "" {
-		return fmt.Errorf("pushgateway_url is required")
+	if c.Metrics.Enabled {
+		if c.Metrics.PushgatewayURL == "" {
+			return fmt.Errorf("metrics.pushgateway_url is required when metrics is enabled")
+		}
 	}
 
 	if c.Retry.MaxAttempts < 1 {
@@ -236,18 +246,20 @@ backup_on_startup = true
 # Path to ludusavi binary (auto-detected if empty)
 ludusavi_path = ""
 
-# Pushgateway URL for metrics
-pushgateway_url = "http://pushgateway"
-
 # HTTP retry configuration
 [retry]
 max_attempts = 3
 initial_delay = "5s"
 max_delay = "30s"
 
-# Apprise notifications
+# Prometheus metrics (optional, disabled by default)
+[metrics]
+enabled = false
+pushgateway_url = "http://pushgateway:9091"
+
+# Apprise notifications (optional, disabled by default)
 [apprise]
-enabled = true
+enabled = false
 url = "http://localhost:8000"
 key = "ludusavi"
 # Notification level: "error", "warning", "always"

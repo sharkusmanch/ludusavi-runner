@@ -54,12 +54,18 @@ func runValidate(cmd *cobra.Command, args []string) error {
 	fmt.Printf("  Config file: %s\n", configPath)
 	fmt.Printf("  Interval: %s\n", cfg.Interval)
 	fmt.Printf("  Backup on startup: %t\n", cfg.BackupOnStartup)
-	fmt.Printf("  Pushgateway URL: %s\n", cfg.PushgatewayURL)
+	if cfg.Metrics.Enabled {
+		fmt.Printf("  Metrics: enabled\n")
+		fmt.Printf("  Pushgateway URL: %s\n", cfg.Metrics.PushgatewayURL)
+	} else {
+		fmt.Printf("  Metrics: disabled\n")
+	}
 	if cfg.Apprise.Enabled {
+		fmt.Printf("  Notifications: enabled\n")
 		fmt.Printf("  Apprise URL: %s\n", cfg.Apprise.URL)
 		fmt.Printf("  Notification level: %s\n", cfg.Apprise.Notify)
 	} else {
-		fmt.Printf("  Apprise: disabled\n")
+		fmt.Printf("  Notifications: disabled\n")
 	}
 	fmt.Println()
 
@@ -90,17 +96,19 @@ func runValidate(cmd *cobra.Command, args []string) error {
 		http.WithLogger(logger),
 	)
 
-	// Check pushgateway
-	pushgatewayClient := metrics.NewPushgatewayClient(
-		cfg.PushgatewayURL,
-		metrics.WithHTTPClient(httpClient),
-		metrics.WithLogger(logger),
-	)
+	// Check pushgateway if enabled
+	if cfg.Metrics.Enabled {
+		pushgatewayClient := metrics.NewPushgatewayClient(
+			cfg.Metrics.PushgatewayURL,
+			metrics.WithHTTPClient(httpClient),
+			metrics.WithLogger(logger),
+		)
 
-	if err := pushgatewayClient.Validate(ctx); err != nil {
-		fmt.Printf("  ✗ Pushgateway: %v\n", err)
-	} else {
-		fmt.Printf("  ✓ Pushgateway reachable\n")
+		if err := pushgatewayClient.Validate(ctx); err != nil {
+			fmt.Printf("  ✗ Pushgateway: %v\n", err)
+		} else {
+			fmt.Printf("  ✓ Pushgateway reachable\n")
+		}
 	}
 
 	// Check apprise if enabled

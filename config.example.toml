@@ -11,18 +11,20 @@ backup_on_startup = true
 # Path to ludusavi binary (auto-detected if empty)
 ludusavi_path = ""
 
-# Pushgateway URL for metrics
-pushgateway_url = "http://pushgateway"
-
 # HTTP retry configuration
 [retry]
 max_attempts = 3
 initial_delay = "5s"
 max_delay = "30s"
 
-# Apprise notifications
+# Prometheus metrics (optional, disabled by default)
+[metrics]
+enabled = false
+pushgateway_url = "http://pushgateway:9091"
+
+# Apprise notifications (optional, disabled by default)
 [apprise]
-enabled = true
+enabled = false
 url = "http://localhost:8000"
 key = "ludusavi"
 # Notification level: "error", "warning", "always"
