@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/spf13/cobra"
 	"github.com/sharkusmanch/ludusavi-runner/internal/app"
 	"github.com/sharkusmanch/ludusavi-runner/internal/executor"
 	"github.com/sharkusmanch/ludusavi-runner/internal/http"
 	"github.com/sharkusmanch/ludusavi-runner/internal/metrics"
 	"github.com/sharkusmanch/ludusavi-runner/internal/notify"
+	"github.com/spf13/cobra"
 )
 
 // NewRunCmd creates the run command.
@@ -96,4 +96,3 @@ func runRun(cmd *cobra.Command, args []string) error {
 
 	return nil
 }
-

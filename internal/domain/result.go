@@ -60,14 +60,14 @@ func (r *BackupResult) Complete(success bool, err error) {
 
 // RunResult contains the results of a complete backup run (all operations).
 type RunResult struct {
-	StartTime   time.Time       `json:"start_time"`
-	EndTime     time.Time       `json:"end_time"`
-	Duration    time.Duration   `json:"duration"`
-	Success     bool            `json:"success"`
-	DryRun      bool            `json:"dry_run"`
-	Backup      *BackupResult   `json:"backup,omitempty"`
-	CloudUpload *BackupResult   `json:"cloud_upload,omitempty"`
-	Errors      []string        `json:"errors,omitempty"`
+	StartTime   time.Time     `json:"start_time"`
+	EndTime     time.Time     `json:"end_time"`
+	Duration    time.Duration `json:"duration"`
+	Success     bool          `json:"success"`
+	DryRun      bool          `json:"dry_run"`
+	Backup      *BackupResult `json:"backup,omitempty"`
+	CloudUpload *BackupResult `json:"cloud_upload,omitempty"`
+	Errors      []string      `json:"errors,omitempty"`
 }
 
 // NewRunResult creates a new RunResult.

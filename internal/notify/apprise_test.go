@@ -8,9 +8,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/sharkusmanch/ludusavi-runner/internal/domain"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/sharkusmanch/ludusavi-runner/internal/domain"
 )
 
 func TestAppriseClient_Notify_Success(t *testing.T) {
@@ -19,7 +19,7 @@ func TestAppriseClient_Notify_Success(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		receivedPath = r.URL.Path
-		json.NewDecoder(r.Body).Decode(&receivedBody)
+		_ = json.NewDecoder(r.Body).Decode(&receivedBody)
 		w.WriteHeader(http.StatusOK)
 	}))
 	defer server.Close()
@@ -40,7 +40,7 @@ func TestAppriseClient_Notify_TruncatesLongBody(t *testing.T) {
 	var receivedBody appriseRequest
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		json.NewDecoder(r.Body).Decode(&receivedBody)
+		_ = json.NewDecoder(r.Body).Decode(&receivedBody)
 		w.WriteHeader(http.StatusOK)
 	}))
 	defer server.Close()
@@ -61,7 +61,7 @@ func TestAppriseClient_Notify_TruncatesLongBody(t *testing.T) {
 func TestAppriseClient_Notify_Failure(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("server error"))
+		_, _ = w.Write([]byte("server error"))
 	}))
 	defer server.Close()
 

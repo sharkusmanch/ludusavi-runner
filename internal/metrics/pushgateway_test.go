@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/sharkusmanch/ludusavi-runner/internal/domain"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/sharkusmanch/ludusavi-runner/internal/domain"
 )
 
 func TestPushgatewayClient_Push_Success(t *testing.T) {
@@ -20,7 +20,7 @@ func TestPushgatewayClient_Push_Success(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		receivedPath = r.URL.Path
 		body := make([]byte, r.ContentLength)
-		r.Body.Read(body)
+		_, _ = r.Body.Read(body)
 		receivedBody = string(body)
 		w.WriteHeader(http.StatusOK)
 	}))
@@ -55,7 +55,7 @@ func TestPushgatewayClient_Push_Success(t *testing.T) {
 func TestPushgatewayClient_Push_Failure(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("internal error"))
+		_, _ = w.Write([]byte("internal error"))
 	}))
 	defer server.Close()
 

@@ -100,7 +100,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (*Response, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to read request body: %w", err)
 		}
-		req.Body.Close()
+		_ = req.Body.Close()
 	}
 
 	for attempt := 1; attempt <= c.retry.MaxAttempts; attempt++ {
@@ -143,8 +143,8 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (*Response, error) {
 			continue
 		}
 
-		defer resp.Body.Close()
 		body, err := io.ReadAll(resp.Body)
+		_ = resp.Body.Close()
 		if err != nil {
 			lastErr = fmt.Errorf("failed to read response body: %w", err)
 			continue
@@ -237,7 +237,7 @@ func (c *Client) CheckConnectivity(ctx context.Context, url string) error {
 	if err != nil {
 		return fmt.Errorf("connectivity check failed: %w", err)
 	}
-	defer resp.Body.Close()
+	_ = resp.Body.Close()
 
 	// Accept any 2xx or common endpoint responses
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {

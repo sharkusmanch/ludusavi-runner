@@ -6,13 +6,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"github.com/sharkusmanch/ludusavi-runner/internal/config"
 	"github.com/sharkusmanch/ludusavi-runner/internal/domain"
 	"github.com/sharkusmanch/ludusavi-runner/internal/executor"
 	"github.com/sharkusmanch/ludusavi-runner/internal/metrics"
 	"github.com/sharkusmanch/ludusavi-runner/internal/notify"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func testConfig() *config.Config {

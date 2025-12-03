@@ -6,10 +6,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/sharkusmanch/ludusavi-runner/internal/config"
 	"github.com/sharkusmanch/ludusavi-runner/pkg/version"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -40,8 +40,8 @@ It can run as a one-shot backup, a foreground service, or as a system service.`,
 	rootCmd.PersistentFlags().StringVar(&logLevel, "log-level", "", "log level (debug, info, warn, error)")
 
 	// Bind flags to viper
-	viper.BindPFlag("dry_run", rootCmd.PersistentFlags().Lookup("dry-run"))
-	viper.BindPFlag("log.level", rootCmd.PersistentFlags().Lookup("log-level"))
+	_ = viper.BindPFlag("dry_run", rootCmd.PersistentFlags().Lookup("dry-run"))
+	_ = viper.BindPFlag("log.level", rootCmd.PersistentFlags().Lookup("log-level"))
 
 	// Add subcommands
 	rootCmd.AddCommand(NewRunCmd())

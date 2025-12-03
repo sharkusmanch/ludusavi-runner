@@ -24,11 +24,11 @@ type LudusaviOutput struct {
 
 // LudusaviOverall contains the overall statistics from ludusavi.
 type LudusaviOverall struct {
-	TotalGames     int                   `json:"totalGames"`
-	TotalBytes     int64                 `json:"totalBytes"`
-	ProcessedGames int                   `json:"processedGames"`
-	ProcessedBytes int64                 `json:"processedBytes"`
-	ChangedGames   LudusaviChangedGames  `json:"changedGames"`
+	TotalGames     int                  `json:"totalGames"`
+	TotalBytes     int64                `json:"totalBytes"`
+	ProcessedGames int                  `json:"processedGames"`
+	ProcessedBytes int64                `json:"processedBytes"`
+	ChangedGames   LudusaviChangedGames `json:"changedGames"`
 }
 
 // LudusaviChangedGames contains the breakdown of changed games.
@@ -169,6 +169,7 @@ func (e *LudusaviExecutor) run(ctx context.Context, args ...string) ([]byte, err
 
 	e.logger.Debug("executing ludusavi", "path", path, "args", args)
 
+	// #nosec G204 -- path is from config or auto-detected, not user input
 	cmd := exec.CommandContext(ctx, path, args...)
 
 	var stdout, stderr bytes.Buffer

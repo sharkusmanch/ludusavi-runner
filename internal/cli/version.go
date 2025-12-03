@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/spf13/cobra"
 	"github.com/sharkusmanch/ludusavi-runner/pkg/version"
+	"github.com/spf13/cobra"
 )
 
 var versionJSON bool

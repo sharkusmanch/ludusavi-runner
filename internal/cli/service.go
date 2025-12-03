@@ -3,8 +3,8 @@ package cli
 import (
 	"fmt"
 
-	"github.com/spf13/cobra"
 	"github.com/sharkusmanch/ludusavi-runner/internal/platform"
+	"github.com/spf13/cobra"
 )
 
 var (

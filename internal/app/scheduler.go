@@ -16,9 +16,9 @@ type Scheduler struct {
 	backupOnStartup bool
 	logger          *slog.Logger
 
-	mu       sync.Mutex
-	running  bool
-	stopCh   chan struct{}
+	mu        sync.Mutex
+	running   bool
+	stopCh    chan struct{}
 	stoppedCh chan struct{}
 }
 

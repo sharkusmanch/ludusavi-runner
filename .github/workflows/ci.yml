@@ -38,7 +38,8 @@ jobs:
           go-version: ${{ matrix.go-version }}
 
       - name: Run tests
-        run: go test -v -race -coverprofile=coverage.out ./...
+        shell: bash
+        run: go test -v -race -coverprofile coverage.out ./...
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4

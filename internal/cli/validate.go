@@ -6,12 +6,12 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/spf13/cobra"
 	"github.com/sharkusmanch/ludusavi-runner/internal/config"
 	"github.com/sharkusmanch/ludusavi-runner/internal/executor"
 	"github.com/sharkusmanch/ludusavi-runner/internal/http"
 	"github.com/sharkusmanch/ludusavi-runner/internal/metrics"
 	"github.com/sharkusmanch/ludusavi-runner/internal/notify"
+	"github.com/spf13/cobra"
 )
 
 // NewValidateCmd creates the validate command.
