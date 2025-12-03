@@ -8,7 +8,7 @@ const (
 	DefaultInterval        = 20 * time.Minute
 	DefaultBackupOnStartup = true
 
-	DefaultMetricsEnabled    = false
+	DefaultMetricsEnabled        = false
 	DefaultMetricsPushgatewayURL = ""
 
 	DefaultRetryMaxAttempts  = 3
