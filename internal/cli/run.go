@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"log/slog"
 
 	"github.com/sharkusmanch/ludusavi-runner/internal/app"
 	"github.com/sharkusmanch/ludusavi-runner/internal/executor"
@@ -32,7 +31,10 @@ func runRun(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
 
-	logger := slog.Default()
+	logger, err := setupLogging(cfg)
+	if err != nil {
+		return fmt.Errorf("failed to setup logging: %w", err)
+	}
 
 	// Create HTTP client with retry config
 	httpClient := http.NewClient(

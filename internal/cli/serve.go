@@ -3,7 +3,6 @@ package cli
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
@@ -39,7 +38,10 @@ func runServe(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
 
-	logger := slog.Default()
+	logger, err := setupLogging(cfg)
+	if err != nil {
+		return fmt.Errorf("failed to setup logging: %w", err)
+	}
 	logger.Info("starting ludusavi-runner in foreground mode")
 
 	// Create HTTP client with retry config

@@ -3,7 +3,6 @@ package cli
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"time"
 
 	"github.com/sharkusmanch/ludusavi-runner/internal/config"
@@ -33,7 +32,6 @@ This checks:
 }
 
 func runValidate(cmd *cobra.Command, args []string) error {
-	logger := slog.Default()
 	ctx, cancel := context.WithTimeout(cmd.Context(), 30*time.Second)
 	defer cancel()
 
@@ -71,6 +69,7 @@ func runValidate(cmd *cobra.Command, args []string) error {
 
 	// Check ludusavi
 	fmt.Println("Checks:")
+	logger, _ := setupLogging(cfg)
 	execOpts := []executor.LudusaviOption{
 		executor.WithLogger(logger),
 	}

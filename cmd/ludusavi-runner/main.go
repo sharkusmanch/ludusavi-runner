@@ -3,8 +3,12 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"io"
 	"log/slog"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/sharkusmanch/ludusavi-runner/internal/app"
 	"github.com/sharkusmanch/ludusavi-runner/internal/cli"
@@ -30,6 +34,44 @@ func main() {
 	cli.Execute()
 }
 
+// setupLogging configures logging based on the loaded config.
+func setupLogging(cfg *config.Config) (*slog.Logger, error) {
+	// Determine log level
+	level := slog.LevelInfo
+	switch strings.ToLower(cfg.Log.Level) {
+	case "debug":
+		level = slog.LevelDebug
+	case "warn":
+		level = slog.LevelWarn
+	case "error":
+		level = slog.LevelError
+	}
+
+	// Determine output destination
+	var output io.Writer = os.Stderr
+	if cfg.Log.Output != "" {
+		// Ensure directory exists
+		dir := filepath.Dir(cfg.Log.Output)
+		if err := os.MkdirAll(dir, 0750); err != nil {
+			return nil, fmt.Errorf("failed to create log directory: %w", err)
+		}
+
+		file, err := os.OpenFile(cfg.Log.Output, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)
+		if err != nil {
+			return nil, fmt.Errorf("failed to open log file: %w", err)
+		}
+		output = file
+	}
+
+	handler := slog.NewTextHandler(output, &slog.HandlerOptions{
+		Level: level,
+	})
+	logger := slog.New(handler)
+	slog.SetDefault(logger)
+
+	return logger, nil
+}
+
 // runAsService runs the application as a Windows service.
 func runAsService() error {
 	return platform.RunAsService(func(ctx context.Context) error {
@@ -41,7 +83,10 @@ func runAsService() error {
 		}
 
 		// Set up logging
-		logger := slog.Default()
+		logger, err := setupLogging(cfg)
+		if err != nil {
+			return err
+		}
 
 		// Create HTTP client
 		httpClient := http.NewClient(
