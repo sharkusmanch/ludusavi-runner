@@ -118,77 +118,55 @@ func (p *PushgatewayClient) buildMetrics(m *domain.Metrics) string {
 		versionInfo.Version, runtime.Version()))
 	b.WriteString("\n")
 
-	// Result metrics
-	for _, result := range m.Results {
-		p.writeResultMetrics(&b, result)
+	// Write HELP/TYPE declarations once for result metrics
+	if len(m.Results) > 0 {
+		b.WriteString("# HELP ludusavi_last_run_timestamp_seconds Unix timestamp of last run\n")
+		b.WriteString("# TYPE ludusavi_last_run_timestamp_seconds gauge\n")
+		b.WriteString("# HELP ludusavi_last_run_success Whether the last run succeeded\n")
+		b.WriteString("# TYPE ludusavi_last_run_success gauge\n")
+		b.WriteString("# HELP ludusavi_last_run_duration_seconds Duration of last run\n")
+		b.WriteString("# TYPE ludusavi_last_run_duration_seconds gauge\n")
+		b.WriteString("# HELP ludusavi_games_total Total games detected\n")
+		b.WriteString("# TYPE ludusavi_games_total gauge\n")
+		b.WriteString("# HELP ludusavi_games_processed Games processed in last run\n")
+		b.WriteString("# TYPE ludusavi_games_processed gauge\n")
+		b.WriteString("# HELP ludusavi_bytes_total Total bytes across all saves\n")
+		b.WriteString("# TYPE ludusavi_bytes_total gauge\n")
+		b.WriteString("# HELP ludusavi_bytes_processed Bytes processed in last run\n")
+		b.WriteString("# TYPE ludusavi_bytes_processed gauge\n")
+		b.WriteString("# HELP ludusavi_games_new New games backed up\n")
+		b.WriteString("# TYPE ludusavi_games_new gauge\n")
+		b.WriteString("# HELP ludusavi_games_changed Games with changes\n")
+		b.WriteString("# TYPE ludusavi_games_changed gauge\n")
+		b.WriteString("\n")
+
+		// Write metric values for each result
+		for _, result := range m.Results {
+			p.writeResultMetrics(&b, result)
+		}
 	}
 
 	return b.String()
 }
 
-// writeResultMetrics writes metrics for a single backup result.
+// writeResultMetrics writes metric values for a single backup result.
 func (p *PushgatewayClient) writeResultMetrics(b *strings.Builder, r *domain.BackupResult) {
 	op := r.Operation.String()
 
-	// Last run timestamp
-	b.WriteString("# HELP ludusavi_last_run_timestamp_seconds Unix timestamp of last run\n")
-	b.WriteString("# TYPE ludusavi_last_run_timestamp_seconds gauge\n")
-	b.WriteString(fmt.Sprintf("ludusavi_last_run_timestamp_seconds{operation=%q} %d\n",
-		op, r.EndTime.Unix()))
-	b.WriteString("\n")
-
-	// Last run success
-	b.WriteString("# HELP ludusavi_last_run_success Whether the last run succeeded\n")
-	b.WriteString("# TYPE ludusavi_last_run_success gauge\n")
 	success := 0
 	if r.Success {
 		success = 1
 	}
+
+	b.WriteString(fmt.Sprintf("ludusavi_last_run_timestamp_seconds{operation=%q} %d\n", op, r.EndTime.Unix()))
 	b.WriteString(fmt.Sprintf("ludusavi_last_run_success{operation=%q} %d\n", op, success))
-	b.WriteString("\n")
-
-	// Last run duration
-	b.WriteString("# HELP ludusavi_last_run_duration_seconds Duration of last run\n")
-	b.WriteString("# TYPE ludusavi_last_run_duration_seconds gauge\n")
-	b.WriteString(fmt.Sprintf("ludusavi_last_run_duration_seconds{operation=%q} %.3f\n",
-		op, r.Duration.Seconds()))
-	b.WriteString("\n")
-
-	// Games total
-	b.WriteString("# HELP ludusavi_games_total Total games detected\n")
-	b.WriteString("# TYPE ludusavi_games_total gauge\n")
+	b.WriteString(fmt.Sprintf("ludusavi_last_run_duration_seconds{operation=%q} %.3f\n", op, r.Duration.Seconds()))
 	b.WriteString(fmt.Sprintf("ludusavi_games_total{operation=%q} %d\n", op, r.Stats.TotalGames))
-	b.WriteString("\n")
-
-	// Games processed
-	b.WriteString("# HELP ludusavi_games_processed Games processed in last run\n")
-	b.WriteString("# TYPE ludusavi_games_processed gauge\n")
 	b.WriteString(fmt.Sprintf("ludusavi_games_processed{operation=%q} %d\n", op, r.Stats.ProcessedGames))
-	b.WriteString("\n")
-
-	// Bytes total
-	b.WriteString("# HELP ludusavi_bytes_total Total bytes across all saves\n")
-	b.WriteString("# TYPE ludusavi_bytes_total gauge\n")
 	b.WriteString(fmt.Sprintf("ludusavi_bytes_total{operation=%q} %d\n", op, r.Stats.TotalBytes))
-	b.WriteString("\n")
-
-	// Bytes processed
-	b.WriteString("# HELP ludusavi_bytes_processed Bytes processed in last run\n")
-	b.WriteString("# TYPE ludusavi_bytes_processed gauge\n")
 	b.WriteString(fmt.Sprintf("ludusavi_bytes_processed{operation=%q} %d\n", op, r.Stats.ProcessedBytes))
-	b.WriteString("\n")
-
-	// Games new
-	b.WriteString("# HELP ludusavi_games_new New games backed up\n")
-	b.WriteString("# TYPE ludusavi_games_new gauge\n")
 	b.WriteString(fmt.Sprintf("ludusavi_games_new{operation=%q} %d\n", op, r.Stats.NewGames))
-	b.WriteString("\n")
-
-	// Games changed
-	b.WriteString("# HELP ludusavi_games_changed Games with changes\n")
-	b.WriteString("# TYPE ludusavi_games_changed gauge\n")
 	b.WriteString(fmt.Sprintf("ludusavi_games_changed{operation=%q} %d\n", op, r.Stats.ChangedGames))
-	b.WriteString("\n")
 }
 
 // Ensure PushgatewayClient implements domain.MetricsPusher.
