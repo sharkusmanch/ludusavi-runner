@@ -89,9 +89,7 @@ func (s *Scheduler) Start(ctx context.Context) error {
 	// Run backup on startup if configured
 	if s.backupOnStartup {
 		s.logger.Debug("running backup on startup")
-		if _, err := s.runner.Run(ctx); err != nil {
-			s.logger.Error("startup backup failed", "error", err)
-		}
+		s.runBackup(ctx)
 	}
 
 	// Schedule periodic backups
@@ -112,11 +110,47 @@ func (s *Scheduler) Start(ctx context.Context) error {
 
 		case <-ticker.C:
 			s.logger.Debug("interval triggered, running backup")
-			if _, err := s.runner.Run(ctx); err != nil {
-				s.logger.Error("scheduled backup failed", "error", err)
-			}
+			s.runBackup(ctx)
 		}
 	}
+}
+
+// runBackup runs a backup with a separate context that allows graceful completion.
+// If shutdown is requested during a backup, the backup gets a 2 minute grace period.
+func (s *Scheduler) runBackup(ctx context.Context) {
+	// Check if shutdown was already requested before starting
+	select {
+	case <-ctx.Done():
+		return
+	default:
+	}
+
+	// Create a backup context that allows graceful completion
+	backupCtx, cancel := context.WithCancel(context.Background())
+	done := make(chan struct{})
+
+	// Monitor for shutdown and give grace period
+	go func() {
+		select {
+		case <-done:
+			// Backup completed normally
+		case <-ctx.Done():
+			// Shutdown requested - give grace period then cancel
+			s.logger.Info("shutdown requested, allowing backup to complete (2m grace period)")
+			select {
+			case <-done:
+			case <-time.After(2 * time.Minute):
+				s.logger.Warn("backup grace period expired, cancelling")
+				cancel()
+			}
+		}
+	}()
+
+	if _, err := s.runner.Run(backupCtx); err != nil {
+		s.logger.Error("backup failed", "error", err)
+	}
+	close(done)
+	cancel()
 }
 
 // Stop signals the scheduler to stop.
