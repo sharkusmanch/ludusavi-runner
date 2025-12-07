@@ -11,6 +11,8 @@ const (
 	AppName = "ludusavi-runner"
 	// ConfigFileName is the default config file name.
 	ConfigFileName = "config.toml"
+	// LogFileName is the default log file name.
+	LogFileName = "ludusavi-runner.log"
 	// EnvPrefix is the prefix for environment variables.
 	EnvPrefix = "LUDUSAVI_RUNNER"
 )
@@ -59,6 +61,16 @@ func DefaultConfigPath() (string, error) {
 		return "", err
 	}
 	return filepath.Join(dir, ConfigFileName), nil
+}
+
+// DefaultLogPath returns the full path to the default log file.
+// The log file is stored in the same directory as the config file.
+func DefaultLogPath() (string, error) {
+	dir, err := DefaultConfigDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(dir, LogFileName), nil
 }
 
 // DefaultLogDir returns the default log directory for the current OS.

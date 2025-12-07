@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 
+	"github.com/sharkusmanch/ludusavi-runner/internal/config"
 	"github.com/sharkusmanch/ludusavi-runner/internal/platform"
 	"github.com/spf13/cobra"
 )
@@ -43,10 +44,22 @@ func runInstall(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("--password is required when --username is specified")
 	}
 
+	// Resolve config path - if not specified, use the default path for the current user.
+	// This is important because services may run as a different user (e.g., LocalSystem)
+	// which would have a different default config path.
+	configPath := cfgFile
+	if configPath == "" {
+		var err error
+		configPath, err = config.DefaultConfigPath()
+		if err != nil {
+			return fmt.Errorf("failed to determine default config path: %w", err)
+		}
+	}
+
 	opts := platform.InstallOptions{
 		Username:   installUsername,
 		Password:   installPassword,
-		ConfigPath: cfgFile,
+		ConfigPath: configPath,
 		AutoStart:  true,
 	}
 
@@ -55,6 +68,7 @@ func runInstall(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Println("Service installed successfully.")
+	fmt.Printf("Config file: %s\n", configPath)
 	if installUsername != "" {
 		fmt.Printf("Service will run as: %s\n", installUsername)
 	} else {

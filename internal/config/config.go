@@ -84,6 +84,16 @@ func (l *Loader) Load() (*Config, error) {
 		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
 	}
 
+	// Set default log path if not specified.
+	// This is done after loading because the default path depends on the config directory.
+	if cfg.Log.Output == "" {
+		logPath, err := DefaultLogPath()
+		if err == nil {
+			cfg.Log.Output = logPath
+		}
+		// If we can't determine the default path, leave it empty (will log to stderr)
+	}
+
 	if err := cfg.Validate(); err != nil {
 		return nil, fmt.Errorf("invalid config: %w", err)
 	}
@@ -269,8 +279,8 @@ notify = "error"
 [log]
 # Level: debug, info, warn, error
 level = "info"
-# Output: empty for stderr, or file path
-output = ""
+# Output file path (defaults to ludusavi-runner.log in config directory)
+# output = ""
 # Max log file size before rotation (MB)
 max_size_mb = 10
 `

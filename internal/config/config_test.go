@@ -142,7 +142,14 @@ func TestConfig_Validate(t *testing.T) {
 }
 
 func TestLoader_Load_Defaults(t *testing.T) {
-	loader := NewLoader()
+	// Use an empty config file to ensure we get pure defaults
+	// (without picking up the user's actual config file)
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, "config.toml")
+	err := os.WriteFile(configPath, []byte(""), 0600)
+	require.NoError(t, err)
+
+	loader := NewLoader().WithConfigPath(configPath)
 	cfg, err := loader.Load()
 	require.NoError(t, err)
 
@@ -212,12 +219,18 @@ max_size_mb = 20
 }
 
 func TestLoader_Load_EnvOverrides(t *testing.T) {
+	// Use an empty config file to isolate from user's config
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, "config.toml")
+	err := os.WriteFile(configPath, []byte(""), 0600)
+	require.NoError(t, err)
+
 	// Set environment variables
 	t.Setenv("LUDUSAVI_RUNNER_INTERVAL", "45m")
 	t.Setenv("LUDUSAVI_RUNNER_BACKUP_ON_STARTUP", "false")
 	t.Setenv("LUDUSAVI_RUNNER_LOG_LEVEL", "debug")
 
-	loader := NewLoader()
+	loader := NewLoader().WithConfigPath(configPath)
 	cfg, err := loader.Load()
 	require.NoError(t, err)
 
@@ -227,7 +240,13 @@ func TestLoader_Load_EnvOverrides(t *testing.T) {
 }
 
 func TestLoader_Set(t *testing.T) {
-	loader := NewLoader()
+	// Use an empty config file to isolate from user's config
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, "config.toml")
+	err := os.WriteFile(configPath, []byte(""), 0600)
+	require.NoError(t, err)
+
+	loader := NewLoader().WithConfigPath(configPath)
 	loader.Set("interval", "60m")
 	loader.Set("log.level", "error")
 

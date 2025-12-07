@@ -2,7 +2,6 @@
 package cli
 
 import (
-	"fmt"
 	"io"
 	"log/slog"
 	"os"
@@ -13,6 +12,7 @@ import (
 	"github.com/sharkusmanch/ludusavi-runner/pkg/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 var (
@@ -122,14 +122,17 @@ func setupLogging(cfg *config.Config) (*slog.Logger, error) {
 		// Ensure directory exists
 		dir := filepath.Dir(cfg.Log.Output)
 		if err := os.MkdirAll(dir, 0750); err != nil {
-			return nil, fmt.Errorf("failed to create log directory: %w", err)
+			return nil, err
 		}
 
-		file, err := os.OpenFile(cfg.Log.Output, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)
-		if err != nil {
-			return nil, fmt.Errorf("failed to open log file: %w", err)
+		// Use lumberjack for log rotation
+		output = &lumberjack.Logger{
+			Filename:   cfg.Log.Output,
+			MaxSize:    cfg.Log.MaxSizeMB,
+			MaxBackups: 3,
+			MaxAge:     28, // days
+			Compress:   true,
 		}
-		output = file
 	}
 
 	handler := slog.NewTextHandler(output, &slog.HandlerOptions{
