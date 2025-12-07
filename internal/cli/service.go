@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"os/user"
 
 	"github.com/sharkusmanch/ludusavi-runner/internal/platform"
 	"github.com/spf13/cobra"
@@ -10,6 +9,7 @@ import (
 
 var (
 	installUsername string
+	installPassword string
 )
 
 // NewInstallCmd creates the install command.
@@ -26,6 +26,7 @@ On macOS, this would install a launchd plist (not yet implemented).`,
 	}
 
 	cmd.Flags().StringVar(&installUsername, "username", "", "username to run the service as (Windows)")
+	cmd.Flags().StringVar(&installPassword, "password", "", "password for the service account (Windows)")
 
 	return cmd
 }
@@ -37,17 +38,14 @@ func runInstall(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("service management is not supported on this platform")
 	}
 
-	// Default to current user if not specified
-	username := installUsername
-	if username == "" {
-		currentUser, err := user.Current()
-		if err == nil {
-			username = currentUser.Username
-		}
+	// Validate: if username is specified, password is required
+	if installUsername != "" && installPassword == "" {
+		return fmt.Errorf("--password is required when --username is specified")
 	}
 
 	opts := platform.InstallOptions{
-		Username:   username,
+		Username:   installUsername,
+		Password:   installPassword,
 		ConfigPath: cfgFile,
 		AutoStart:  true,
 	}
@@ -57,8 +55,10 @@ func runInstall(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Println("Service installed successfully.")
-	if username != "" {
-		fmt.Printf("Service will run as: %s\n", username)
+	if installUsername != "" {
+		fmt.Printf("Service will run as: %s\n", installUsername)
+	} else {
+		fmt.Println("Service will run as: LocalSystem")
 	}
 	fmt.Println("Use 'ludusavi-runner start' to start the service.")
 	return nil
