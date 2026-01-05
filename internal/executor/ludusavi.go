@@ -46,6 +46,7 @@ type LudusaviErrors struct {
 // LudusaviExecutor implements Executor using the ludusavi CLI.
 type LudusaviExecutor struct {
 	binaryPath string
+	env        map[string]string
 	logger     *slog.Logger
 }
 
@@ -63,6 +64,13 @@ func WithBinaryPath(path string) LudusaviOption {
 func WithLogger(logger *slog.Logger) LudusaviOption {
 	return func(e *LudusaviExecutor) {
 		e.logger = logger
+	}
+}
+
+// WithEnv sets environment variables to pass to ludusavi.
+func WithEnv(env map[string]string) LudusaviOption {
+	return func(e *LudusaviExecutor) {
+		e.env = env
 	}
 }
 
@@ -171,6 +179,15 @@ func (e *LudusaviExecutor) run(ctx context.Context, args ...string) ([]byte, err
 
 	// #nosec G204 -- path is from config or auto-detected, not user input
 	cmd := exec.CommandContext(ctx, path, args...)
+
+	// Set environment variables if configured
+	if len(e.env) > 0 {
+		// Start with current environment and add/override with configured vars
+		cmd.Env = os.Environ()
+		for k, v := range e.env {
+			cmd.Env = append(cmd.Env, k+"="+v)
+		}
+	}
 
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout

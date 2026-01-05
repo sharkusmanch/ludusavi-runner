@@ -12,14 +12,15 @@ import (
 
 // Config holds all application configuration.
 type Config struct {
-	Interval        time.Duration `mapstructure:"interval"`
-	BackupOnStartup bool          `mapstructure:"backup_on_startup"`
-	LudusaviPath    string        `mapstructure:"ludusavi_path"`
-	DryRun          bool          `mapstructure:"dry_run"`
-	Retry           RetryConfig   `mapstructure:"retry"`
-	Metrics         MetricsConfig `mapstructure:"metrics"`
-	Apprise         AppriseConfig `mapstructure:"apprise"`
-	Log             LogConfig     `mapstructure:"log"`
+	Interval        time.Duration     `mapstructure:"interval"`
+	BackupOnStartup bool              `mapstructure:"backup_on_startup"`
+	LudusaviPath    string            `mapstructure:"ludusavi_path"`
+	DryRun          bool              `mapstructure:"dry_run"`
+	Env             map[string]string `mapstructure:"env"`
+	Retry           RetryConfig       `mapstructure:"retry"`
+	Metrics         MetricsConfig     `mapstructure:"metrics"`
+	Apprise         AppriseConfig     `mapstructure:"apprise"`
+	Log             LogConfig         `mapstructure:"log"`
 }
 
 // MetricsConfig holds Prometheus metrics configuration.
@@ -255,6 +256,11 @@ backup_on_startup = true
 
 # Path to ludusavi binary (auto-detected if empty)
 ludusavi_path = ""
+
+# Environment variables to pass to ludusavi (useful for rclone config when running as a service)
+# [env]
+# RCLONE_CONFIG = "C:\\Users\\username\\AppData\\Roaming\\rclone\\rclone.conf"
+# RCLONE_PASSWORD_COMMAND = "powershell C:\\path\\to\\rclone_pass.ps1"
 
 # HTTP retry configuration
 [retry]

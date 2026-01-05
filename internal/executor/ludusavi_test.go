@@ -103,3 +103,15 @@ func TestNewLudusaviExecutor_WithBinaryPath(t *testing.T) {
 
 	assert.Equal(t, "/custom/path/ludusavi", executor.binaryPath)
 }
+
+func TestNewLudusaviExecutor_WithEnv(t *testing.T) {
+	env := map[string]string{
+		"RCLONE_CONFIG":           "/path/to/rclone.conf",
+		"RCLONE_PASSWORD_COMMAND": "echo secret",
+	}
+	executor := NewLudusaviExecutor(WithEnv(env))
+
+	assert.Equal(t, env, executor.env)
+	assert.Equal(t, "/path/to/rclone.conf", executor.env["RCLONE_CONFIG"])
+	assert.Equal(t, "echo secret", executor.env["RCLONE_PASSWORD_COMMAND"])
+}
