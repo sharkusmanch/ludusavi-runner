@@ -105,6 +105,9 @@ func runAsService() error {
 		if cfg.LudusaviPath != "" {
 			execOpts = append(execOpts, executor.WithBinaryPath(cfg.LudusaviPath))
 		}
+		if len(cfg.Env) > 0 {
+			execOpts = append(execOpts, executor.WithEnv(cfg.Env))
+		}
 		exec := executor.NewLudusaviExecutor(execOpts...)
 
 		// Create runner
