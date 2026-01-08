@@ -203,24 +203,28 @@ func (r *Runner) sendNotifications(ctx context.Context, result *domain.RunResult
 
 	notifyLevel := r.config.Apprise.Notify
 
-	// Determine if we should notify
+	// Determine if we should notify based on result and configured level
 	shouldNotify := false
 	var notification *domain.Notification
 
-	switch {
-	case !result.Success && (notifyLevel == config.NotifyError || notifyLevel == config.NotifyWarning || notifyLevel == config.NotifyAlways):
-		shouldNotify = true
-		notification = domain.ErrorNotification(
-			"Ludusavi Backup Failed",
-			r.buildErrorMessage(result),
-		)
-
-	case notifyLevel == config.NotifyAlways:
-		shouldNotify = true
-		notification = domain.InfoNotification(
-			"Ludusavi Backup Completed",
-			r.buildSuccessMessage(result),
-		)
+	if !result.Success {
+		// On failure, notify if level is error, warning, or always
+		if notifyLevel == config.NotifyError || notifyLevel == config.NotifyWarning || notifyLevel == config.NotifyAlways {
+			shouldNotify = true
+			notification = domain.ErrorNotification(
+				"Ludusavi Backup Failed",
+				r.buildErrorMessage(result),
+			)
+		}
+	} else {
+		// On success, only notify if level is "always"
+		if notifyLevel == config.NotifyAlways {
+			shouldNotify = true
+			notification = domain.InfoNotification(
+				"Ludusavi Backup Completed",
+				r.buildSuccessMessage(result),
+			)
+		}
 	}
 
 	if !shouldNotify || notification == nil {
